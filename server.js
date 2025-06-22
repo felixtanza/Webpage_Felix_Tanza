@@ -57,6 +57,8 @@ const menuRoutes = require('./routes/menu');
 const orderRoutes = require('./routes/order');
 const adminRoutes = require('./routes/admin');
 const mpesaRoutes = require('./routes/mpesa');
+const paymentRoutes = require('./routes/payment');
+const mpesaCb = require('./routes/mpesaCallback');
 
 // Route mounting
 app.use('/auth', authRoutes);
@@ -64,10 +66,11 @@ app.use('/menu', menuRoutes);
 app.use('/order', orderRoutes);
 app.use('/admin', adminRoutes);
 app.use('/mpesa', mpesaRoutes);
+app.use('/payment', paymentRoutes);
+app.use(mpesaCb); // handles POST /mpesa/callback endpoint
 
-app.use('/menu', require('./routes/menu'));
-app.use('/payment', require('./routes/payment'));
-app.use('/', require('./routes/mpesaCallback'));
+
+
 
 // Home route
 app.get('/', (req, res) => {
