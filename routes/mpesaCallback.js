@@ -2,36 +2,41 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
-const logger = require('../utils/logger');
 const User = require('../models/User');
-
-await User.findByIdAndUpdate(order.user, {
-  $inc: { loyaltyPoints: 1 }
-});
-
+const logger = require('../utils/logger');
 
 router.post('/mpesa/callback', async (req, res) => {
   try {
-    const { Body } = req.body;
-    const callback = Body?.stkCallback;
+    const { Body: { stkCallback } } = req.body;
+    const result = stkCallback;
 
-    const orderId = callback?.Metadata?.Item?.find(i => i.Name === 'AccountReference')?.Value;
-    const amount = callback?.Metadata?.Item?.find(i => i.Name === 'Amount')?.Value;
+    const accountRef = result.CallbackMetadata?.Item.find(i => i.Name === 'AccountReference')?.Value;
+    const amount = result.CallbackMetadata?.Item.find(i => i.Name === 'Amount')?.Value;
+    const receipt = result.CallbackMetadata?.Item.find(i => i.Name === 'MpesaReceiptNumber')?.Value;
 
-    if (callback?.ResultCode === 0) {
-      await Order.findOneAndUpdate(
-        { total: amount, status: 'pending' },
-        { status: 'paid' }
-      );
-      logger.info(`M-Pesa payment confirmed for amount ${amount}`);
+    if (result.ResultCode === 0) {
+      const orderId = accountRef.replace('ORDER', '');
+      const order = await Order.findById(orderId);
+      if (!order) {
+        logger.error(`Order not found via callback reference: ${orderId}`);
+        return res.status(404).send();
+      }
+      order.status = 'paid';
+      order.paymentMethod = 'M-Pesa';
+      order.transactionId = receipt;
+      await order.save();
+
+      await User.findByIdAndUpdate(order.user, { $inc: { loyaltyPoints: 1 } });
+
+      logger.info(`M-Pesa callback success for order ${orderId}`);
     } else {
-      logger.warn(`M-Pesa payment failed: ${callback?.ResultDesc}`);
+      logger.warn(`M-Pesa payment failed: ${result.ResultDesc}`);
     }
 
-    res.status(200).json({ message: 'Callback received' });
+    res.status(200).send({ message: 'Callback processed' });
   } catch (err) {
-    logger.error('Callback handling failed:', err.message);
-    res.status(500).end();
+    logger.error('M-Pesa callback handling error', err.message);
+    res.status(500).send();
   }
 });
 
