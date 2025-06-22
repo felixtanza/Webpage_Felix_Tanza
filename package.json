@@ -1,32 +1,26 @@
 {
-  "name": "tanfel-hotel-system",
+  "name": "stark-hotel-server",
   "version": "1.0.0",
-  "description": "A powerful multi-page food ordering system with real-time orders, payment integration, error handling, user authentication, loyalty rewards, and admin dashboard.",
+  "description": "Backend server for Stark Hotel website",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node server.js"
   },
-  "author": "Dr. Felix Tanza Otieno",
+  "keywords": [],
+  "author": "Felix Tanza Otieno",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.6.0",
-    "bcrypt": "^5.1.0",
-    "body-parser": "^1.20.2",
+    "bcrypt": "^5.1.1",
     "connect-flash": "^0.1.1",
-    "connect-mongo": "^5.0.0",
-    "cookie-parser": "^1.4.6",
-    "dotenv": "^16.4.0",
+    "connect-mongo": "^5.1.0",
+    "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
-    "express": "^4.19.2",
-    "express-session": "^1.17.4",
-    "mongoose": "^7.6.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mongoose": "^7.6.0",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.9.8",
-    "paypal-rest-sdk": "^1.8.1",
-    "uuid": "^9.0.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.2"
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
+    "paypal-rest-sdk": "^1.8.1"
   }
 }
