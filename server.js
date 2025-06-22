@@ -24,15 +24,22 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(morgan('dev'));
 
 // Sessions
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'secret123',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
-    cookie: { maxAge: 1000 * 60 * 60 * 2 }, // 2 hours
-  })
-);
+
+
+app.use(session({
+  secret: process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI, // Make sure this env variable is set!
+    collectionName: 'sessions'
+  }),
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    secure: false // true if using https
+  }
+}));
+    
 
 // Flash messages
 app.use(flash());
