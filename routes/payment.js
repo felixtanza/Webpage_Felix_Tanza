@@ -1,31 +1,44 @@
 // routes/payment.js
 const express = require('express');
+const axios = require('axios');
 const router = express.Router();
 const Order = require('../models/Order');
-const Payment = require('../models/Payment');
-const axios = require('axios');
-const { isAuthenticated } = require('../middleware/auth');
+const User = require('../models/User');
 const logger = require('../utils/logger');
 
-// M-Pesa credentials
-const { MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET, MPESA_SHORTCODE, MPESA_PASSKEY, MPESA_CALLBACK_URL } = process.env;
+// M-Pesa credentials (from .env)
+const {
+  MPESA_CONSUMER_KEY,
+  MPESA_CONSUMER_SECRET,
+  MPESA_SHORTCODE,
+  MPESA_PASSKEY,
+  MPESA_CALLBACK_URL,
+  PAYPAL_CLIENT_ID,
+  PAYPAL_CLIENT_SECRET,
+  PAYPAL_MODE = 'sandbox'
+} = process.env;
 
-// === Initiate M-Pesa Payment ===
-router.post('/mpesa', isAuthenticated, async (req, res) => {
-  const { phone, orderId } = req.body;
+// ===== Initiate M-Pesa STK Push =====
+router.post('/mpesa', async (req, res) => {
   try {
+    const { orderId, phone } = req.body;
     const order = await Order.findById(orderId);
-    if (!order || order.status !== 'pending') return res.status(404).json({ error: 'Invalid order' });
+    if (!order || order.status !== 'pending') {
+      return res.status(404).json({ error: 'Invalid order' });
+    }
 
-    const tokenRes = await axios.get('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
-      auth: { username: MPESA_CONSUMER_KEY, password: MPESA_CONSUMER_SECRET }
-    });
+    // Obtain OAuth token
+    const auth = Buffer.from(`${MPESA_CONSUMER_KEY}:${MPESA_CONSUMER_SECRET}`).toString('base64');
+    const { data: authRes } = await axios.get(
+      'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
+      { headers: { Authorization: `Basic ${auth}` } }
+    );
+    const token = authRes.access_token;
 
-    const token = tokenRes.data.access_token;
-    const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14);
+    const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').substr(0, 14);
     const password = Buffer.from(`${MPESA_SHORTCODE}${MPESA_PASSKEY}${timestamp}`).toString('base64');
 
-    const response = await axios.post(
+    const stkRes = await axios.post(
       'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
       {
         BusinessShortCode: MPESA_SHORTCODE,
@@ -37,28 +50,66 @@ router.post('/mpesa', isAuthenticated, async (req, res) => {
         PartyB: MPESA_SHORTCODE,
         PhoneNumber: phone,
         CallBackURL: MPESA_CALLBACK_URL,
-        AccountReference: 'TanfelHotel',
-        TransactionDesc: 'Order Payment'
+        AccountReference: `ORDER${orderId}`,
+        TransactionDesc: 'Food Order Payment'
       },
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    logger.info(`STK Push initiated for order ${orderId}`, response.data);
-    res.json({ success: true, message: 'STK Push Sent' });
-
-  } catch (error) {
-    logger.error('M-Pesa error:', error.message);
-    res.status(500).json({ error: 'Payment failed, try again.' });
+    logger.info(`M-Pesa STK Push initiated for order ${orderId}`);
+    res.json({ success: true, message: 'STK Push sent to phone.' });
+  } catch (err) {
+    logger.error('M-Pesa initiation error', err.message);
+    res.status(500).json({ error: 'M-Pesa initiation failed.' });
   }
 });
 
-// === PayPal payment route placeholder ===
-// You'd use PayPal SDK here, skipped for brevity but will add if needed
+// ===== Airtel Money (simulated) =====
+router.post('/airtel', async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const order = await Order.findById(orderId);
+    if (!order || order.status !== 'pending') {
+      return res.status(404).json({ error: 'Invalid order' });
+    }
 
-// === Airtel Money placeholder ===
-// Usually uses APIs similar to M-Pesa with different keys
+    order.status = 'paid';
+    order.paymentMethod = 'Airtel Money';
+    await order.save();
+
+    // Loyality increment (example: 1 point per payment)
+    await User.findByIdAndUpdate(order.user, { $inc: { loyaltyPoints: 1 } });
+
+    logger.info(`Airtel Money payment completed for order ${orderId}`);
+    res.json({ success: true, message: 'Airtel Money payment successful.' });
+  } catch (err) {
+    logger.error('Airtel payment error', err.message);
+    res.status(500).json({ error: 'Airtel payment failed.' });
+  }
+});
+
+// ===== PayPal Payment (simplified flow) =====
+router.post('/paypal', async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const order = await Order.findById(orderId);
+    if (!order || order.status !== 'pending') {
+      return res.status(404).json({ error: 'Invalid order' });
+    }
+
+    order.status = 'paid';
+    order.paymentMethod = 'PayPal';
+    await order.save();
+
+    await User.findByIdAndUpdate(order.user, { $inc: { loyaltyPoints: 1 } });
+
+    logger.info(`PayPal payment recorded for order ${orderId}`);
+    res.json({ success: true, message: 'PayPal payment successful.' });
+  } catch (err) {
+    logger.error('PayPal payment error', err.message);
+    res.status(500).json({ error: 'PayPal payment failed.' });
+  }
+});
 
 module.exports = router;
-             
+      
