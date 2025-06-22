@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Place Your Order</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+  <div class="loader" id="loader">Processing Payment...</div>
+
+  <section class="order-section">
+    <h2>Review Your Order</h2>
+    <div id="order-summary"></div>
+
+    <label for="phone">Enter Phone Number:</label>
+    <input type="text" id="phone" placeholder="e.g. 2547XXXXXXXX">
+
+    <h3>Select Payment Method:</h3>
+    <div class="payment-options">
+      <button onclick="payWithMpesa()">Pay with M-Pesa</button>
+      <button onclick="payWithAirtel()">Pay with Airtel</button>
+      <button onclick="payWithPaypal()">Pay with PayPal</button>
+    </div>
+  </section>
+
+  <section class="loyalty-section">
+    <h4>Loyalty Progress</h4>
+    <div class="loyalty-bar">
+      <div class="progress" id="loyalty-progress"></div>
+    </div>
+    <button id="claim-btn" onclick="claimFreeMeal()" style="display:none;">Claim Free Meal</button>
+  </section>
+
+  <script src="/js/payment.js"></script>
+</body>
+  </html>
+    
