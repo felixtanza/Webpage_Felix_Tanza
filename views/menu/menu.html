@@ -14,6 +14,14 @@
     <h1>Welcome, <%= user.username %></h1>
     <a href="/logout">Logout</a>
   </header>
+  <div class="loyalty-bar">
+  <label>🎉 Loyalty Progress:</label>
+  <progress value="<%= user.loyaltyPoints %>" max="5"></progress>
+  <% if (user.loyaltyPoints >= 5) { %>
+    <p>🎁 You can now claim a FREE MEAL!</p>
+  <% } %>
+  </div>
+    
 
   <section class="menu">
     <% menu.forEach(item => { %>
