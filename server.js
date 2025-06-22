@@ -65,6 +65,10 @@ app.use('/order', orderRoutes);
 app.use('/admin', adminRoutes);
 app.use('/mpesa', mpesaRoutes);
 
+app.use('/menu', require('./routes/menu'));
+app.use('/payment', require('./routes/payment'));
+app.use('/', require('./routes/mpesaCallback'));
+
 // Home route
 app.get('/', (req, res) => {
   res.redirect('/menu');
