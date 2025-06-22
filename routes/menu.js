@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const MenuItem = require('../models/MenuItem');
 const Order = require('../models/Order');
-const { isAuthenticated } = require('./middleware/auth');
+const { isAuthenticated } = require('../middleware/auth');
 
 // GET /menu - Display available menu items
 router.get('/', isAuthenticated, async (req, res) => {
