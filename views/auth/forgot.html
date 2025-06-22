@@ -1,0 +1,25 @@
+<!-- views/auth/forgot.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Forgot Password | Food Order</title>
+  <link rel="stylesheet" href="/css/auth.css" />
+  <script defer src="/js/loading.js"></script>
+</head>
+<body>
+  <div class="loader-wrapper" id="loader">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <main class="glass-card">
+    <h2>Reset Password</h2>
+    <form>
+      <input type="email" placeholder="Enter your email" required />
+      <button type="submit" disabled>Send Reset Link (Coming Soon)</button>
+      <p><a href="/auth/login">Back to Login</a></p>
+    </form>
+  </main>
+</body>
+</html>
