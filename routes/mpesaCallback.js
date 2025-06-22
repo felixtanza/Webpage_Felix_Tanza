@@ -3,6 +3,12 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 const logger = require('../utils/logger');
+const User = require('../models/User');
+
+await User.findByIdAndUpdate(order.user, {
+  $inc: { loyaltyPoints: 1 }
+});
+
 
 router.post('/mpesa/callback', async (req, res) => {
   try {
