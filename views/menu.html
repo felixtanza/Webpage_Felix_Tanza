@@ -1,0 +1,41 @@
+<!-- views/menu/menu.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Menu | Tanfel Hotel</title>
+  <link rel="stylesheet" href="/css/menu.css">
+  <script defer src="/js/menu.js"></script>
+</head>
+<body>
+  <div class="loader-wrapper" id="loader"><div class="spinner"></div></div>
+
+  <header>
+    <h1>Welcome, <%= user.username %></h1>
+    <a href="/logout">Logout</a>
+  </header>
+
+  <section class="menu">
+    <% menu.forEach(item => { %>
+      <div class="card">
+        <img src="<%= item.image %>" alt="<%= item.name %>">
+        <h3><%= item.name %></h3>
+        <p><%= item.description %></p>
+        <span>KES <%= item.price %></span>
+        <button onclick="addToCart('<%= item._id %>', '<%= item.name %>', <%= item.price %>)">Add</button>
+      </div>
+    <% }) %>
+  </section>
+
+  <section class="cart">
+    <h2>Your Cart</h2>
+    <ul id="cartItems"></ul>
+    <p>Total: KES <span id="cartTotal">0</span></p>
+    <form id="orderForm" action="/menu/order" method="POST">
+      <input type="hidden" name="items" id="orderItems">
+      <button type="submit">Place Order</button>
+    </form>
+  </section>
+</body>
+    </html>
+      
