@@ -6,32 +6,38 @@ const path = require('path');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const flash = require('connect-flash');
+const ejs = require('ejs');
 
 dotenv.config();
 
 const app = express();
 
-// Check environment variables
+// Check required environment variables
 if (!process.env.MONGODB_URI) {
-  console.error('❌ MONGODB_URI is missing in environment variables.');
+  console.error('❌ Missing MONGODB_URI in environment variables.');
   process.exit(1);
 }
 if (!process.env.JWT_SECRET) {
-  console.error('❌ JWT_SECRET is missing in environment variables.');
+  console.error('❌ Missing JWT_SECRET in environment variables.');
   process.exit(1);
 }
 
-// Middleware
+// Middleware for parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'ejs');
+
+// Register EJS as renderer for .html files
+app.engine('html', ejs.renderFile);
+app.set('view engine', 'html');
 app.set('views', path.join(__dirname, 'views'));
 
 // Logger
 app.use(morgan('dev'));
 
-// Sessions
+// Session management
 app.use(
   session({
     secret: process.env.JWT_SECRET,
@@ -43,15 +49,13 @@ app.use(
     }),
     cookie: {
       maxAge: 1000 * 60 * 60 * 24, // 1 day
-      secure: false, // set to true if using HTTPS
+      secure: false, // change to true if you're using HTTPS
     },
   })
 );
 
 // Flash messages
 app.use(flash());
-
-// Middleware for flash and user session
 app.use((req, res, next) => {
   res.locals.userId = req.session.userId || null;
   res.locals.success = req.flash('success');
@@ -59,16 +63,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// Database connection
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Connected'))
+  .then(() => console.log('✅ MongoDB connected'))
   .catch((err) => {
-    console.error('❌ MongoDB Connection Error:', err);
+    console.error('❌ MongoDB connection error:', err);
     process.exit(1);
   });
 
-// Import routes
+// Import route modules
 const authRoutes = require('./routes/auth');
 const menuRoutes = require('./routes/menu');
 const orderRoutes = require('./routes/order');
@@ -86,25 +90,20 @@ app.use('/mpesa', mpesaRoutes);
 app.use('/payment', paymentRoutes);
 app.use(mpesaCb);
 
-// Home redirect
-app.get('/', (req, res) => {
-  res.redirect('/menu');
-});
+// Default redirect
+app.get('/', (req, res) => res.redirect('/menu'));
 
 // 404 handler
-app.use((req, res) => {
-  res.status(404).render('404', { message: 'Page not found' });
-});
+app.use((req, res) => res.status(404).render('404.html', { message: 'Page not found' }));
 
-// Error handler
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('🔥 Server Error:', err.stack);
-  res.status(500).render('error', { error: err.message });
+  res.status(500).render('error.html', { error: err.message });
 });
 
-// Start server
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
-                          
