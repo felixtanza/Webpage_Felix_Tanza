@@ -1,0 +1,210 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Loader */
+.loader-wrapper {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.spinner {
+  border: 6px solid #ccc;
+  border-top: 6px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Header */
+header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  font-size: 22px;
+}
+
+.logout-btn {
+  background: #e74c3c;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.logout-btn:hover {
+  background: #c0392b;
+}
+
+/* Loyalty Bar */
+.loyalty-bar {
+  padding: 10px 20px;
+  background: #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+progress {
+  width: 100%;
+  height: 20px;
+}
+
+.reward-message {
+  color: green;
+  font-weight: bold;
+}
+
+/* Layout */
+main {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px;
+  gap: 30px;
+  justify-content: center;
+}
+
+/* Menu Cards */
+.menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  flex: 2;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.card-info {
+  padding: 15px;
+}
+
+.card h3 {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.card p {
+  font-size: 14px;
+  color: #555;
+}
+
+.card .price {
+  display: block;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.card button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.card button:hover {
+  background: #2980b9;
+}
+
+/* Cart Section */
+.cart {
+  background: #fefefe;
+  border: 1px solid #ccc;
+  padding: 20px;
+  flex: 1;
+  border-radius: 10px;
+  max-width: 350px;
+}
+
+.cart h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.cart ul {
+  list-style: none;
+  margin-bottom: 15px;
+}
+
+.cart ul li {
+  padding: 5px 0;
+  border-bottom: 1px dashed #ccc;
+}
+
+#cartTotal {
+  font-weight: bold;
+}
+
+.cart button[type="submit"] {
+  margin-top: 10px;
+  width: 100%;
+  background: #27ae60;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cart button[type="submit"]:hover {
+  background: #219150;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .cart {
+    width: 100%;
+  }
+
+  .menu {
+    grid-template-columns: 1fr;
+  }
+}
