@@ -4,46 +4,53 @@
 <head>
   <meta charset="UTF-8">
   <title>Menu | Tanfel Hotel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/css/menu.css">
   <script defer src="/js/menu.js"></script>
 </head>
 <body>
-  <div class="loader-wrapper" id="loader"><div class="spinner"></div></div>
+  <div class="loader-wrapper" id="loader">
+    <div class="spinner"></div>
+  </div>
 
   <header>
     <h1>Welcome, <%= user.username %></h1>
-    <a href="/logout">Logout</a>
+    <a href="/logout" class="logout-btn">Logout</a>
   </header>
+
   <div class="loyalty-bar">
-  <label>🎉 Loyalty Progress:</label>
-  <progress value="<%= user.loyaltyPoints %>" max="5"></progress>
-  <% if (user.loyaltyPoints >= 5) { %>
-    <p>🎁 You can now claim a FREE MEAL!</p>
-  <% } %>
+    <label for="loyaltyProgress">🎉 Loyalty Progress:</label>
+    <progress id="loyaltyProgress" value="<%= user.loyaltyPoints %>" max="5"></progress>
+    <% if (user.loyaltyPoints >= 5) { %>
+      <p class="reward-message">🎁 You can now claim a FREE MEAL!</p>
+    <% } %>
   </div>
-    
 
-  <section class="menu">
-    <% menu.forEach(item => { %>
-      <div class="card">
-        <img src="<%= item.image %>" alt="<%= item.name %>">
-        <h3><%= item.name %></h3>
-        <p><%= item.description %></p>
-        <span>KES <%= item.price %></span>
-        <button onclick="addToCart('<%= item._id %>', '<%= item.name %>', <%= item.price %>)">Add</button>
-      </div>
-    <% }) %>
-  </section>
+  <main>
+    <section class="menu">
+      <% menu.forEach(item => { %>
+        <div class="card">
+          <img src="<%= item.image %>" alt="<%= item.name %>">
+          <div class="card-info">
+            <h3><%= item.name %></h3>
+            <p><%= item.description %></p>
+            <span class="price">KES <%= item.price %></span>
+            <button onclick="addToCart('<%= item._id %>', '<%= item.name %>', <%= item.price %>)">Add</button>
+          </div>
+        </div>
+      <% }) %>
+    </section>
 
-  <section class="cart">
-    <h2>Your Cart</h2>
-    <ul id="cartItems"></ul>
-    <p>Total: KES <span id="cartTotal">0</span></p>
-    <form id="orderForm" action="/menu/order" method="POST">
-      <input type="hidden" name="items" id="orderItems">
-      <button type="submit">Place Order</button>
-    </form>
-  </section>
+    <section class="cart">
+      <h2>Your Cart</h2>
+      <ul id="cartItems"></ul>
+      <p>Total: KES <span id="cartTotal">0</span></p>
+      <form id="orderForm" action="/menu/order" method="POST">
+        <input type="hidden" name="items" id="orderItems">
+        <button type="submit">Place Order</button>
+      </form>
+    </section>
+  </main>
 </body>
-    </html>
-      
+  </html>
+                                      
