@@ -1,56 +1,141 @@
-<!-- views/menu/menu.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Menu | Tanfel Hotel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/css/menu.css">
   <script defer src="/js/menu.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #343a40;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+      text-align: center;
+    }
+    .card img {
+      max-width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .card h3 {
+      margin: 10px 0 5px;
+    }
+    .card span {
+      font-weight: bold;
+      color: #28a745;
+    }
+    .cart {
+      background: #fff;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .cart h2 {
+      margin-bottom: 10px;
+    }
+    .cart ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 10px;
+    }
+    .cart ul li {
+      margin-bottom: 5px;
+    }
+    #phoneNumber {
+      padding: 8px;
+      width: 100%;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .loyalty-bar {
+      padding: 1rem;
+      background: #fffbe7;
+      text-align: center;
+    }
+    .loader-wrapper {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <div class="loader-wrapper" id="loader">
-    <div class="spinner"></div>
-  </div>
+  <div class="loader-wrapper" id="loader"><div class="spinner"></div></div>
 
   <header>
     <h1>Welcome, <%= user.username %></h1>
-    <a href="/logout" class="logout-btn">Logout</a>
+    <a href="/logout">Logout</a>
   </header>
 
   <div class="loyalty-bar">
-    <label for="loyaltyProgress">🎉 Loyalty Progress:</label>
-    <progress id="loyaltyProgress" value="<%= user.loyaltyPoints %>" max="5"></progress>
+    <label>🎉 Loyalty Progress:</label>
+    <progress value="<%= user.loyaltyPoints %>" max="5"></progress>
     <% if (user.loyaltyPoints >= 5) { %>
-      <p class="reward-message">🎁 You can now claim a FREE MEAL!</p>
+      <p>🎁 You can now claim a FREE MEAL!</p>
     <% } %>
   </div>
 
-  <main>
-    <section class="menu">
-      <% menu.forEach(item => { %>
-        <div class="card">
-          <img src="<%= item.image %>" alt="<%= item.name %>">
-          <div class="card-info">
-            <h3><%= item.name %></h3>
-            <p><%= item.description %></p>
-            <span class="price">KES <%= item.price %></span>
-            <button onclick="addToCart('<%= item._id %>', '<%= item.name %>', <%= item.price %>)">Add</button>
-          </div>
-        </div>
-      <% }) %>
-    </section>
+  <section class="menu">
+    <% menu.forEach(item => { %>
+      <div class="card">
+        <img src="<%= item.image %>" alt="<%= item.name %>">
+        <h3><%= item.name %></h3>
+        <p><%= item.description %></p>
+        <span>KES <%= item.price %></span><br>
+        <button onclick="addToCart('<%= item._id %>', '<%= item.name %>', <%= item.price %>)">Add</button>
+      </div>
+    <% }) %>
+  </section>
 
-    <section class="cart">
-      <h2>Your Cart</h2>
-      <ul id="cartItems"></ul>
-      <p>Total: KES <span id="cartTotal">0</span></p>
-      <form id="orderForm" action="/menu/order" method="POST">
-        <input type="hidden" name="items" id="orderItems">
-        <button type="submit">Place Order</button>
-      </form>
-    </section>
-  </main>
+  <section class="cart">
+    <h2>Your Cart</h2>
+    <ul id="cartItems"></ul>
+    <p>Total: KES <span id="cartTotal">0</span></p>
+
+    <form id="orderForm" action="/menu/order" method="POST">
+      <input type="hidden" name="items" id="orderItems">
+      <input type="hidden" name="total" id="orderTotal">
+
+      <label for="phoneNumber">📞 Enter M-Pesa Phone Number:</label>
+      <input type="text" name="phoneNumber" id="phoneNumber" placeholder="07XXXXXXXX" required>
+
+      <button type="submit">Pay Now</button>
+    </form>
+  </section>
 </body>
-  </html>
-                                      
+                    </html>
+  
